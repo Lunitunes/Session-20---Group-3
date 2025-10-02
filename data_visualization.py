@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
  
-path = "file.csv"
+path = "processed_data/testingDataset.csv"
  
 df = pd.read_csv(path)
  
 plt.figure(figsize=(8,5))
-sns.countplot(data=df, x='category', order=df['category'].value_counts().index)
+sns.countplot(data=df, x='encodedCategory', order=df['encodedCategory'].value_counts().index)
 plt.title("Distribution of Traffic Categories")
 plt.xticks(rotation=45)
 plt.show()
