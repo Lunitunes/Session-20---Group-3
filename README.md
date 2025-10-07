@@ -21,3 +21,7 @@ You will need to do the following in order to properly run this project
 	1. pip install pandas numpy 
 	2. pip install scikit-learn imbalanced-learn
 	3. pip install matplotlib seaborn
+
+5. Running the python scripts!
+   There are a few included python scripts within this folder. There are the included pre-processing scripts, the ML training model scripts, and the data visualization scripts. The process for running each script is as such:
+   	1. 
