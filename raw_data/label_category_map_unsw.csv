@@ -1,0 +1,11 @@
+encodedCategory, categoryName, description
+0, Normal, Benign traffic
+1, Fuzzers, Attempts to find bugs by feeding random input
+2, Analysis, Traffic used for analysis attacks
+3, Backdoor, Unauthorized remote access
+4, DoS, Denial of service
+5, Exploits, Exploiting vulnerabilities
+6, Generic, Generic attacks (catch-all)
+7, Reconnaissance, Scanning or information gathering
+8, Shellcode, Shellcode execution attacks
+9, Worms, Self-replicating malware
