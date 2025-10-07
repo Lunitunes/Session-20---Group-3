@@ -24,6 +24,4 @@ You will need to do the following in order to properly run this project
 
 # Running the scripts!
    There are a few included python scripts within this folder. There are the included pre-processing scripts for the datasets, the ML training model scripts, and the data visualization scripts. The process for running each script is as such:
-   1. 
-   2. 
-   3. 
+   
