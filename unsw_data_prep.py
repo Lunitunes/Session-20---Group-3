@@ -8,7 +8,7 @@ import pandas as pd
 
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
-from imblearn.under_sampling import RandomUnderSampler  # hybrid/over options are easy to swap
+from imblearn.under_sampling import RandomUnderSampler
 
 print("=== UNSW Pre-Processing Script ===")
 print("Pre-Processing Setting Up...")
