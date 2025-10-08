@@ -1,14 +1,20 @@
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+import sys
+from pathlib import Path
 
-training = pd.read_csv("processed_data/merged/trainingDataset.csv")
-validation = pd.read_csv("processed_data/merged/validationDataset.csv")
+BASE_DIR = Path(__file__).resolve().parent.parent
+TRAIN_PATH = BASE_DIR / "processed_data" / "nb15" / "trainingDataset.csv"
+VAL_PATH = BASE_DIR / "processed_data" / "nb15" / "validationDataset.csv"
 
-X_train = training.drop(columns=['encodedCategory'])
+training = pd.read_csv(TRAIN_PATH, na_values=["", " "])
+validation = pd.read_csv(VAL_PATH, na_values=["", " "])
+
+X_train = training.drop(columns=['encodedCategory']).fillna(0)
 y_train = training['encodedCategory']
 
-X_test = validation.drop(columns=['encodedCategory'])
+X_test = validation.drop(columns=['encodedCategory']).fillna(0)
 y_test = validation['encodedCategory']
 
 dt_model = DecisionTreeClassifier(random_state=42)
