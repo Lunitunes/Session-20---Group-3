@@ -5,14 +5,14 @@ from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
  
 #READ THE CSV/DATASET
-df = pd.read_csv(r"data/basic_data_4.csv").drop_duplicates()
+df = pd.read_csv(r"raw_data/basic_data_4.csv").drop_duplicates()
  
 #FILL MISSING VALUES, AVARES THM MEIDAN AND MODE
 df.fillna(df.median(numeric_only=True), inplace=True)
 df.fillna(df.mode().iloc[0], inplace=True)
  
 #READ THE LABEL CATEGORY
-label_category_map = pd.read_csv(r"data/label_category_map.csv")
+label_category_map = pd.read_csv(r"raw_data/label_category_map.csv")
  
 #MAP THE LABELS TO CATEGORIES
 df['category'] = df['label'].map(dict(zip(label_category_map['label'], label_category_map['category'])))
