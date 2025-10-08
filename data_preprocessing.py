@@ -18,7 +18,6 @@ label_category_map = pd.read_csv(r"raw_data/label_category_map.csv")
 df['category'] = df['label'].map(dict(zip(label_category_map['label'], label_category_map['category'])))
  
 #ENCODE THE LABELS AND CATEGORIES
- 
 b = ['category', 'label', 'protocol_type', 'service', 'flag']
 encoders = {}
 for a in b:
@@ -42,10 +41,10 @@ ros = RandomOverSampler(random_state=50)
 xtr_bal, ytr_bal = ros.fit_resample(xtr, ytr)
  
 #BALANCED DATASET BUILD
-testingDataset = pd.DataFrame(xtr_bal, columns=xtr.columns)
-testingDataset['encodedCategory'] = ytr_bal
+trainingDataset = pd.DataFrame(xtr_bal, columns=xtr.columns)
+trainingDataset['encodedCategory'] = ytr_bal
 validationDataset = pd.DataFrame(xte, columns=xte.columns)
 validationDataset['encodedCategory'] = yte
  
-testingDataset.to_csv(r"processed_data/basic/trainingDataset.csv", index=False)
+trainingDataset.to_csv(r"processed_data/basic/trainingDataset.csv", index=False)
 validationDataset.to_csv(r"processed_data/basic/validationDataset.csv", index=False)
