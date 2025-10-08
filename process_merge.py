@@ -20,13 +20,16 @@ OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 merged_df.to_csv(OUT_PATH, index=False)
 
 #ENCODE THE LABELS AND CATEGORIES
-b = ['duration', 'protocol_type', 'service', 'flag', 'category', 'source']
+num_cols = ['duration', 'src_bytes', 'dst_bytes']
+cat_cols = ['protocol_type', 'service', 'flag', 'source']
 encoders = {}
-for a in b:
-    merged_df[a] = LabelEncoder().fit_transform(merged_df[a].astype(str))
+for c in cat_cols:
+    merged_df["encoded_"+c] = LabelEncoder().fit_transform(merged_df[c].astype(str))
+
+merged_df['encoded_category'] = LabelEncoder().fit_transform(merged_df['category'].astype(str))
  
-X = merged_df.drop(['duration', 'protocol_type', 'service', 'flag', 'category', 'source'], axis=1)
-y = merged_df['category']
+X = merged_df[num_cols + ["encoded_"+c for c in cat_cols]]
+y = merged_df['encoded_category']
  
 # THE DATASET SPLIT DATASET. DATASET IS 20% OF THE TOTAL DATASET AND THE OVERSAMPLING IS WORK.
 #REST DATASET IS 80%!!!!

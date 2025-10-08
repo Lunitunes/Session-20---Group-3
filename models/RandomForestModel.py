@@ -2,8 +2,8 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 
-training = pd.read_csv("processed_data/basic/trainingDataset.csv")
-validation = pd.read_csv("processed_data/basic/validationDataset.csv")
+training = pd.read_csv("processed_data/merged/trainingDataset.csv")
+validation = pd.read_csv("processed_data/merged/validationDataset.csv")
 
 X_train = training.drop(columns=['encodedCategory'])
 y_train = training['encodedCategory']

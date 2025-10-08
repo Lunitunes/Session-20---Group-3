@@ -1,12 +1,31 @@
 import pandas as pd
-import numpy as np
-from pathlib import Path
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.pipeline import Pipeline
+training = pd.read_csv("processed_data/merged/trainingDataset.csv")
+validation = pd.read_csv("processed_data/merged/validationDataset.csv")
 
-# loading encoded data
+X_train = training.drop(columns=['encodedCategory'])
+y_train = training['encodedCategory']
 
-df = pd.read_csv("processed_data/Dataset.csv")
+X_test = validation.drop(columns=['encodedCategory'])
+y_test = validation['encodedCategory']
 
+dt_model = DecisionTreeClassifier(random_state=42)
+dt_model.fit(X_train, y_train)
+
+dt_preds = dt_model.predict(X_test)
+
+accuracy = accuracy_score(y_test, dt_preds)
+precision = precision_score(y_test, dt_preds, average='weighted')
+recall = recall_score(y_test, dt_preds, average='weighted')
+f1 = f1_score(y_test, dt_preds, average='weighted')
+
+print(f"\nModel Performance:")
+print(f"Accuracy : {accuracy * 100:.2f}%")
+print(f"Precision: {precision:.2f}")
+print(f"Recall   : {recall:.2f}")
+print(f"F1 Score : {f1:.2f}")
+
+print("\nDetailed Classification Report:\n")
+print(classification_report(y_test, dt_preds))
