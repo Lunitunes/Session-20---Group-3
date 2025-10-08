@@ -47,5 +47,5 @@ testingDataset['encodedCategory'] = ytr_bal
 validationDataset = pd.DataFrame(xte, columns=xte.columns)
 validationDataset['encodedCategory'] = yte
  
-testingDataset.to_csv(r"processed_data/testingDataset.csv", index=False)
-validationDataset.to_csv(r"processed_data/validationDataset.csv", index=False)
+testingDataset.to_csv(r"processed_data/basic/trainingDataset.csv", index=False)
+validationDataset.to_csv(r"processed_data/basic/validationDataset.csv", index=False)
