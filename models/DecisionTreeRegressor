@@ -1,0 +1,36 @@
+import pandas as pd
+from sklearn.tree import DecisionTreeRegressor 
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+import sys
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+TRAIN_PATH = BASE_DIR / "processed_data" / "nb15" / "trainingDataset.csv"
+VAL_PATH = BASE_DIR / "processed_data" / "nb15" / "validationDataset.csv"
+
+training = pd.read_csv(TRAIN_PATH, na_values=["", " "])
+validation = pd.read_csv(VAL_PATH, na_values=["", " "])
+
+X_train = training.drop(columns=['encodedCategory']).fillna(0)
+y_train = training['encodedCategory']
+
+X_test = validation.drop(columns=['encodedCategory']).fillna(0)
+y_test = validation['encodedCategory']
+
+dt_model = DecisionTreeRegressor(random_state=42)
+dt_model.fit(X_train, y_train)
+
+dt_preds = dt_model.predict(X_test)
+
+accuracy = accuracy_score(y_test, dt_preds)
+precision = precision_score(y_test, dt_preds, average='weighted')
+recall = recall_score(y_test, dt_preds, average='weighted')
+f1 = f1_score(y_test, dt_preds, average='weighted')
+
+print(f"\nModel Performance (Regression):")
+print(f"Mean Squared Error : {mse:.2f}")
+print(f"Mean Absolute Error: {mae:.2f}")
+print(f"R2 Score          : {r2:.2f}")
+
+print("\nDetailed Classification Report:\n")
+print(classification_report(y_test, dt_preds))
