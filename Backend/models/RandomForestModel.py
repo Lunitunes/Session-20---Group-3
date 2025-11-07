@@ -23,6 +23,8 @@ rf_model.fit(X_train, y_train)
 
 rf_preds = rf_model.predict(X_test)
 
+print([repr(c) for c in rf_model.feature_names_in_])
+
 accuracy = accuracy_score(y_test, rf_preds)
 precision = precision_score(y_test, rf_preds, average='weighted')
 recall = recall_score(y_test, rf_preds, average='weighted')
@@ -39,4 +41,4 @@ print("\nDetailed Classification Report:\n")
 print(classification_report(y_test, rf_preds))
 
 joblib.dump(rf_model, "rf_model.pkl")
-print("✅ Saved model to rf_model.pkl")
+print("Saved model to rf_model.pkl")

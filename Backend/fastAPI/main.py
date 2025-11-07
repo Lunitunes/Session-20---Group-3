@@ -18,7 +18,7 @@ app.add_middleware(
 )
  
 model = None
-MODEL_FILENAME = "trained_model.pkl"
+MODEL_FILENAME = "rf_model.pkl"
 # THIS FILE SHOULD BE IN THE SAME DIRECTORY AS BACKEND/FASTAPI/MAIN.PY
  
 @app.on_event("startup")
@@ -74,6 +74,8 @@ async def upload_csv(file: UploadFile = File()):
         import io
         df = pd.read_csv(io.StringIO(contents.decode('utf-8')))
 
+        df = df.apply(pd.to_numeric, errors='coerce').fillna(0)
+
         df.columns = df.columns.str.strip().str.lower()
         df = df.drop(columns=["encodedcategory"], errors="ignore")
         df = df[model.feature_names_in_]
@@ -100,4 +102,4 @@ async def predict(input_data: InputData):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {e}")
  
-    return {"prediction": prediction[0]}
+    return {"prediction": int(prediction[0])}
