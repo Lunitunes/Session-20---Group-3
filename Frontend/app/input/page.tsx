@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -43,6 +42,8 @@ export default function InputComponent(){
               <FieldError />
             </Field>
           </FieldGroup>
+
+        <Button type="submit" className="w-full"/>
         </form>
       </div>
     </div>
