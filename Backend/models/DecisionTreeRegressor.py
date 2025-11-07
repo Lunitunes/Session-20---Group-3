@@ -1,6 +1,6 @@
 import pandas as pd
-from sklearn.tree import DecisionTreeRegressor 
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import sys
 from pathlib import Path
 
@@ -22,15 +22,11 @@ dt_model.fit(X_train, y_train)
 
 dt_preds = dt_model.predict(X_test)
 
-accuracy = accuracy_score(y_test, dt_preds)
-precision = precision_score(y_test, dt_preds, average='weighted')
-recall = recall_score(y_test, dt_preds, average='weighted')
-f1 = f1_score(y_test, dt_preds, average='weighted')
+mse = mean_squared_error(y_test, dt_preds)
+mae = mean_absolute_error(y_test, dt_preds)
+r2 = r2_score(y_test, dt_preds)
 
 print(f"\nModel Performance (Regression):")
 print(f"Mean Squared Error : {mse:.2f}")
 print(f"Mean Absolute Error: {mae:.2f}")
 print(f"R2 Score          : {r2:.2f}")
-
-print("\nDetailed Classification Report:\n")
-print(classification_report(y_test, dt_preds))

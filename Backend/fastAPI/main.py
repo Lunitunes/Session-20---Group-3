@@ -1,17 +1,14 @@
-from fastapi import FastAPI, HTTPException, Depends, Request, status
+from fastapi import FastAPI, HTTPException, UploadFile, File, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import os
 import pandas as pd
-import pickle
-from pydantic import BaseModel, Field, ValidationError
-from fastapi.responses import JSONResponse
-from fastapi import BackgroundTasks
-import time
-from fastapi.middleware.cors import CORSMiddleware
-
-
+import joblib
+from pydantic import BaseModel
+ 
 app = FastAPI()
-
-app.middleware(
+ 
+app.add_middleware(
     # frontend communication. Change details for connection.
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,25 +16,24 @@ app.middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+ 
 model = None
 MODEL_FILENAME = "trained_model.pkl"
-# THIS FILE SHOULD BE IN THE SAME DIRECTORY AS BACKEND/FASTAPI/MAIN.PY 
-
-async def startup(app: FastAPI):
+# THIS FILE SHOULD BE IN THE SAME DIRECTORY AS BACKEND/FASTAPI/MAIN.PY
+ 
+@app.on_event("startup")
+async def load_model():
     global model
     try:
-        BDIR = os.path.dirname(__file__)
-        MODEL_PATH = os.path.join(BDIR, MODEL_FILENAME)
-
-        if os.path.exists(MODEL_PATH):
-            with open(MODEL_PATH, "rb") as f:
-                model = pickle.load(f)
+        model_path = os.path.join(os.path.dirname(__file__), MODEL_FILENAME)
+        if os.path.exists(model_path):
+            model = joblib.load(model_path)
+            print(f"Model loaded successfully: {type(model)}")
         else:
-            raise FileNotFoundError(f"No such file or directory for {MODEL_PATH}")
+            print(f"Model file not found at {model_path}")
     except Exception as e:
-        print(f"Couldn't load model with error: {e}")
-
+        print(f"Error loading model: {e}")
+ 
 class InputData(BaseModel):
     proto: float
     service: float
@@ -60,7 +56,7 @@ class InputData(BaseModel):
     is_ftp_login: float
     ct_ftp_cmd: float
     ct_flw_http_mthd: float
-
+ 
 @app.post("/upload_csv")
 async def upload_csv(file: UploadFile = File()):
     if not file.filename.endswith('.csv'):
@@ -77,6 +73,11 @@ async def upload_csv(file: UploadFile = File()):
         contents = await file.read()
         import io
         df = pd.read_csv(io.StringIO(contents.decode('utf-8')))
+
+        df.columns = df.columns.str.strip().str.lower()
+        df = df.drop(columns=["encodedcategory"], errors="ignore")
+        df = df[model.feature_names_in_]
+
         predictions = model.predict(df)
         return JSONResponse(content={
             "predictions": predictions.tolist(),
@@ -87,5 +88,16 @@ async def upload_csv(file: UploadFile = File()):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"message": f"Error processing file: {str(e)}"}
         )
-
-
+ 
+@app.post("/predict")
+async def predict(input_data: InputData):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model is not loaded")
+ 
+    input_df = pd.DataFrame([input_data.dict()])
+    try:
+        prediction = model.predict(input_df)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Prediction error: {e}")
+ 
+    return {"prediction": prediction[0]}
