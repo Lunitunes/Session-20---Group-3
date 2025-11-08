@@ -7,7 +7,7 @@ import joblib
 from pydantic import BaseModel
  
 app = FastAPI()
-
+ 
 app.add_middleware(
     # frontend communication. Change details for connection.
     CORSMiddleware,
@@ -57,6 +57,19 @@ class InputData(BaseModel):
     ct_ftp_cmd: float
     ct_flw_http_mthd: float
 
+CATEGORY_MAP = {
+    0: "Normal",
+    1: "Fuzzers",
+    2: "Analysis",
+    3: "Backdoor",
+    4: "DoS",
+    5: "Exploits",
+    6: "Generic",
+    7: "Reconnaissance",
+    8: "Shellcode",
+    9: "Worms"
+}
+
 @app.post("/upload_csv")
 async def upload_csv(file: UploadFile = File()):
     if not file.filename.endswith('.csv'):
@@ -79,8 +92,10 @@ async def upload_csv(file: UploadFile = File()):
         df = df[model.feature_names_in_]
 
         predictions = model.predict(df)
+        CATEGORY_MAPPING = [CATEGORY_MAP.get(int(p), "Unknown") for p in predictions]
+
         return JSONResponse(content={
-            "predictions": predictions.tolist(),
+            "predictions": CATEGORY_MAPPING,
             "row_count": len(df)
         })
     except Exception as e:
@@ -97,6 +112,8 @@ async def predict(input_data: InputData):
     input_df = pd.DataFrame([input_data.dict()])
     try:
         prediction = model.predict(input_df)
+
+        category_mapping = CATEGORY_MAP.get(int(prediction[0]), "Unknown")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {e}")
  
