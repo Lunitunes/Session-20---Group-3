@@ -22,8 +22,30 @@ export default function InputComponent(){
     resolver: zodResolver(uploadSchema)
   })
 
-  function onSubmit(data: z.infer<typeof uploadSchema>) {
-    // Chuck backend stuff here
+  async function onSubmit(data: z.infer<typeof uploadSchema>) {
+    if (!data.file) return setStatus("No file selected.");
+
+    const formData = new FormData();
+    formData.append("file", data.file);
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/upload_csv", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const result = await res.json();
+  
+      if (!res.ok) {
+        setStatus(`Error: ${result.message}`);
+        return;
+      }
+  
+      console.log(result);
+      setStatus(`Success — Processed ${result.row_count} rows.`);
+    } catch (error) {
+      setStatus("Network error uploading file.");
+    }
   }
 
   return(
@@ -53,7 +75,16 @@ export default function InputComponent(){
             render={({field, fieldState}) => (
             <Field data-invalid={fieldState}>
               <FieldLabel htmlFor={field.name}>Upload File:</FieldLabel>
-              <Input id={field.name} type="file" aria-invalid={fieldState.invalid} accept=".csv"/>
+              <Input 
+              id={field.name} 
+              type="file" 
+              aria-invalid={fieldState.invalid} 
+              accept=".csv"
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0];
+                field.onChange(selectedFile);
+              }}
+              />
               <FieldError errors={[fieldState.error]}/>
             </Field>
             )}
@@ -64,8 +95,6 @@ export default function InputComponent(){
             <Button type="submit" className="w-full">Submit</Button>
           </FieldContent>
         </form>
-
-
       </div>
     </div>
   )
