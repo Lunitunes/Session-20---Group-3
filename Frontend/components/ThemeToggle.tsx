@@ -9,7 +9,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <button onClick={toggle} className="px-2 py-1 border rounded">
+    <button onClick={toggle} className="px-2 py-1 border rounded-full">
       <SunMoonIcon/>
     </button>
   );
