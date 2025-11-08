@@ -149,7 +149,7 @@ async def return_index_ids():
 async def return_index():
     try:
         index = json.loads(INDEX_PATH.read_text())
-        return JSONResponse(index)
+        return index
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

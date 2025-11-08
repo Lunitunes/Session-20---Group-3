@@ -1,34 +1,23 @@
 import { Table,TableBody,TableCaption,TableCell,TableFooter,TableHead,TableHeader,TableRow, } from "@/components/ui/table"
 import ListItem from "@/components/ListItem"
+import { AnalysisSummary } from "@/types/analysis";
 
-export default function DataVisualisations(){
-  const dumby_data = {
-    "analysis_id": "f170b0ff",
-    "analysis_name": "Test",
-    "row_count": 340,
-    "timestamp": "2025-11-08T17:26:41.913147",
-    "category_count": {
-      "Backdoor": 40,
-      "Normal": 34,
-      "Analysis": 34,
-      "DoS": 34,
-      "Generic": 34,
-      "Reconnaissance": 34,
-      "Shellcode": 34,
-      "Worms": 34,
-      "Fuzzers": 32,
-      "Exploits": 30
-    }
-  }
+export default async function DataVisualisations(){
+  const res = await fetch("http://localhost:8000/return_index", { cache: "no-store" });
+  const analyses: AnalysisSummary[] = await res.json();
+  console.log(analyses)
 
-
+  
   return(
     <div className="">
       <h2 className="text-4xl my-5 text-center">Previous Analysis Requests</h2>
-      <ListItem data={dumby_data}/>
-      <Table>
+      {analyses.length === 0 && (
+        <p className="text-muted-foreground text-sm">No analyses yet. Upload one to get started.</p>
+      )}
 
-      </Table>
+      {analyses.map((analysis) => (
+        <ListItem key={analysis.analysis_id} data={analysis} />
+      ))}
     </div>
   )
 }
