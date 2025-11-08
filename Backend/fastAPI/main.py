@@ -1,11 +1,15 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, status
+from fastapi import FastAPI, HTTPException, UploadFile, File, status, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
 import pandas as pd
 import joblib
 from pydantic import BaseModel
- 
+from pathlib import Path
+import uuid
+from datetime import datetime
+import json
+
 app = FastAPI()
  
 app.add_middleware(
@@ -17,9 +21,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
  
+BASE_PATH = Path(__file__).resolve().parent
+
 model = None
 MODEL_FILENAME = "trained_model.pkl"
 # THIS FILE SHOULD BE IN THE SAME DIRECTORY AS BACKEND/FASTAPI/MAIN.PY
+
+ANALYSIS_PATH = BASE_PATH / "analysis_data"
+ANALYSIS_PATH.mkdir(exist_ok=True)
+
+INDEX_PATH    = ANALYSIS_PATH / "index.json"
+if not INDEX_PATH.exists():
+    INDEX_PATH.write_text("[]")
  
 @app.on_event("startup")
 async def load_model():
@@ -71,7 +84,7 @@ CATEGORY_MAP = {
 }
 
 @app.post("/upload_csv")
-async def upload_csv(file: UploadFile = File()):
+async def upload_csv(name: str = Form(...) ,file: UploadFile = File()):
     if not file.filename.endswith('.csv'):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -92,29 +105,31 @@ async def upload_csv(file: UploadFile = File()):
         df = df[model.feature_names_in_]
 
         predictions = model.predict(df)
+        df["prediction"] = predictions
         CATEGORY_MAPPING = [CATEGORY_MAP.get(int(p), "Unknown") for p in predictions]
 
-        return JSONResponse(content={
-            "predictions": CATEGORY_MAPPING,
-            "row_count": len(df)
-        })
+        analysis_id = uuid.uuid4().hex[:8]
+        # Saves Analysis Metadata
+        record = {
+          "analysis_id" : analysis_id,
+          "analysis_name" : name,
+          "row_count" : len(df),
+          "timestamp" : datetime.now().isoformat(),
+          "category_count": df["prediction"].map(CATEGORY_MAP).value_counts().to_dict()
+        }
+        
+        CSV_PATH = ANALYSIS_PATH / f"{analysis_id}.csv"
+        df.to_csv(CSV_PATH, index=False)
+
+        index = json.loads(INDEX_PATH.read_text())
+        index.append(record)
+        INDEX_PATH.write_text(json.dumps(index, indent=2))
+
+        return JSONResponse(record)
+
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"message": f"Error processing file: {str(e)}"}
         )
  
-@app.post("/predict")
-async def predict(input_data: InputData):
-    if model is None:
-        raise HTTPException(status_code=503, detail="Model is not loaded")
- 
-    input_df = pd.DataFrame([input_data.dict()])
-    try:
-        prediction = model.predict(input_df)
-
-        category_mapping = CATEGORY_MAP.get(int(prediction[0]), "Unknown")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Prediction error: {e}")
- 
-    return {"prediction": prediction[0]}
