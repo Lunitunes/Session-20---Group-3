@@ -1,1 +1,3 @@
-unsw_data_preprocessing.py
+Backend/__pycache__/
+Backend/fastAPI/__pycache__/
+Backend/fastAPI/analysis_data/
