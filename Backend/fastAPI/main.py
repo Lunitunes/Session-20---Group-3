@@ -155,3 +155,24 @@ async def return_index():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"message": f"Error retrieving index: {str(e)}"}
         )
+
+@app.get("/get_csv/{analysis_id}")
+async def get_csv(analysis_id: str):
+    CSV_PATH = ANALYSIS_PATH / f"{analysis_id}.csv"
+    
+    if not CSV_PATH.exists():
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"message": "Analysis file not found."}
+        )
+    try:
+        df = pd.read_csv(CSV_PATH)
+        data = df.to_dict(orient="records")
+        
+        return JSONResponse(content=data)
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"message": f"Error reading CSV: {str(e)}"}
+        )
