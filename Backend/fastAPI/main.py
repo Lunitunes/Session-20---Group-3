@@ -132,4 +132,26 @@ async def upload_csv(name: str = Form(...) ,file: UploadFile = File()):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"message": f"Error processing file: {str(e)}"}
         )
- 
+
+@app.get("/return_index_ids")
+async def return_index_ids():
+    try:
+        index = json.loads(INDEX_PATH.read_text())
+        ids = [record["analysis_id"] for record in index]
+        return JSONResponse(ids)
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"message": f"Error retrieving index IDs: {str(e)}"}
+        )
+
+@app.get("/return_index")
+async def return_index():
+    try:
+        index = json.loads(INDEX_PATH.read_text())
+        return JSONResponse(index)
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"message": f"Error retrieving index: {str(e)}"}
+        )
