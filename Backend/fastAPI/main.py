@@ -7,7 +7,7 @@ import joblib
 from pydantic import BaseModel
  
 app = FastAPI()
- 
+
 app.add_middleware(
     # frontend communication. Change details for connection.
     CORSMiddleware,
@@ -18,7 +18,7 @@ app.add_middleware(
 )
  
 model = None
-MODEL_FILENAME = "rf_model.pkl"
+MODEL_FILENAME = "trained_model.pkl"
 # THIS FILE SHOULD BE IN THE SAME DIRECTORY AS BACKEND/FASTAPI/MAIN.PY
  
 @app.on_event("startup")
@@ -56,7 +56,7 @@ class InputData(BaseModel):
     is_ftp_login: float
     ct_ftp_cmd: float
     ct_flw_http_mthd: float
- 
+
 @app.post("/upload_csv")
 async def upload_csv(file: UploadFile = File()):
     if not file.filename.endswith('.csv'):
@@ -73,8 +73,6 @@ async def upload_csv(file: UploadFile = File()):
         contents = await file.read()
         import io
         df = pd.read_csv(io.StringIO(contents.decode('utf-8')))
-
-        df = df.apply(pd.to_numeric, errors='coerce').fillna(0)
 
         df.columns = df.columns.str.strip().str.lower()
         df = df.drop(columns=["encodedcategory"], errors="ignore")
@@ -102,4 +100,4 @@ async def predict(input_data: InputData):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {e}")
  
-    return {"prediction": int(prediction[0])}
+    return {"prediction": prediction[0]}
