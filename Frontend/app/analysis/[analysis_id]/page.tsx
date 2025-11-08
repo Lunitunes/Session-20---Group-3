@@ -1,8 +1,9 @@
 import { AnalysisSummary } from "@/types/analysis";
 
 
+export default function ChartsPage(){
 
-export default function AnalysisSummary(data: AnalysisSummary){
+  
 
 
   return(

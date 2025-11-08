@@ -50,10 +50,8 @@ export default function InputComponent(){
 
   return(
     <div className="grid max-w-sm items-center m-auto w-7xl">
-      <h1 className="text-5xl my-5 text-center">Input a CSV to get started</h1>
+      <h2 className="text-5xl my-5 text-center">Input a CSV to get started</h2>
       <div className="grid gap-2 shadow-lg p-4 rounded-lg bg-card w-full border-2">
-
-
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller 

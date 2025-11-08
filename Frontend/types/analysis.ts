@@ -1,10 +1,9 @@
 
 
 export interface AnalysisSummary {
-  id:string,
-  name: string,
+  analysis_id:string,
+  analysis_name: string,
   row_count: number,
   timestamp: string,
-  category_counts: Record<string, number>,
-  model: string
+  category_count: Record<string, number>
 }
