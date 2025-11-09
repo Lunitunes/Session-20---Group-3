@@ -239,3 +239,25 @@ async def get_training_data(training_data_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"message": f"Error reading training data CSV: {str(e)}"}
         )
+              
+@app.delete("/delete_analysis/{analysis_id}")
+# This function deletes the analysis csv file by its UUID.
+async def delete_analysis(analysis_id: str):
+    CSV_PATH = ANALYSIS_PATH / f"{analysis_id}.csv"
+    try:
+        if CSV_PATH.exists():
+            os.remove(CSV_PATH)
+        
+        index = json.loads(INDEX_PATH.read_text())
+        index = [record for record in index if record["analysis_id"] != analysis_id]
+        INDEX_PATH.write_text(json.dumps(index, indent=2))
+
+        return JSONResponse(
+            content={"message": f"Analysis {analysis_id} deleted successfully."}
+        )
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"message": f"Error deleting analysis: {str(e)}"}
+        )
