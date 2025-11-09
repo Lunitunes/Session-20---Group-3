@@ -1,10 +1,10 @@
 import { Table,TableBody,TableCaption,TableCell,TableFooter,TableHead,TableHeader,TableRow, } from "@/components/ui/table"
 import ListItem from "@/components/ListItem"
-import { AnalysisSummary } from "@/types/analysis";
+import { TrainingSummary } from "@/types/trainingSummary";
 
 export default async function DataVisualisations(){
   const res = await fetch("http://localhost:8000/return_index", { cache: "no-store" });
-  const analyses: AnalysisSummary[] = await res.json();
+  const analyses: TrainingSummary[] = await res.json();
   console.log(analyses)
 
   

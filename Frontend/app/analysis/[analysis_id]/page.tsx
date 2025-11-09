@@ -1,4 +1,4 @@
-import { AnalysisSummary } from "@/types/analysis";
+import TrainingDatasetVisuals from "../TrainingDataVisuals/page"
 
 
 export default function ChartsPage(){
@@ -9,10 +9,10 @@ export default function ChartsPage(){
 
 
   return(
-    <div className="">
-      <h1>Data Visualised</h1>
+    <div className="w-5xl m-auto">
+      <h1 className="text-center ">Data Visualised</h1>
 
-
+      <TrainingDatasetVisuals/>
       <div className="grid">
         <div id="BarChart" className="">
 

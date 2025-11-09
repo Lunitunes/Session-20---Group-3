@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card"
 import { formatTimestamp } from "@/lib/utils";
-import { AnalysisSummary } from "@/types/analysis"
+import { AnalysisSummary } from "@/types/trainingSummary"
 import { Eye, Trash2 } from 'lucide-react';
 import Link from "next/link";
 
