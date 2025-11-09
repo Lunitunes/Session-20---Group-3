@@ -216,3 +216,26 @@ async def get_csv(analysis_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"message": f"Error reading CSV: {str(e)}"}
         )
+
+TRAINING_DATA_PATH = BASE_PATH / "training_data.csv"
+# ID
+@app.get("/get_training_data{training_data_id}")
+async def get_training_data(training_data_id: str):
+    csv_file = TRAINING_DATA_PATH / f"{training_data_id}.csv"
+          
+    if not csv_file.exists():
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"message": "Training data file not found."}
+        )
+    try:
+        df = pd.read_csv(csv_file)
+        data = df.to_dict(orient="records")
+        
+        return JSONResponse(content=data)
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"message": f"Error reading training data CSV: {str(e)}"}
+        )
