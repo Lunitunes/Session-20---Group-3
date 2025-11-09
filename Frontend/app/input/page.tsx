@@ -27,6 +27,7 @@ export default function InputComponent(){
 
     const formData = new FormData();
     formData.append("file", data.file);
+    formData.append("name", data.analysisName);
 
     try {
       const res = await fetch("http://127.0.0.1:8000/upload_csv", {

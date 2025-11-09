@@ -34,5 +34,23 @@
       "Fuzzers": 32,
       "Exploits": 30
     }
+  },
+  {
+    "analysis_id": "49a9b987",
+    "analysis_name": "Predict Test",
+    "row_count": 1,
+    "timestamp": "2025-11-09T21:17:05.218829",
+    "predicted_type": [
+      "Normal"
+    ]
+  },
+  {
+    "analysis_id": "8a36f420",
+    "analysis_name": "Predict Test",
+    "row_count": 1,
+    "timestamp": "2025-11-09T21:23:07.012474",
+    "predicted_type": [
+      "Normal"
+    ]
   }
 ]
