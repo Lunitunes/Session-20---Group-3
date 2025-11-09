@@ -2,13 +2,13 @@
 import { Card } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { TrainingSummary, CategoryChartRow } from "@/types/trainingSummary";
-import ChartPieLegend from "./PieChart";
+import ChartPieLegend from "../../../components/charts/PieChart";
 
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell, 
   Pie, PieChart
 } from "recharts";
-import TrainingBarActive from "./BarChart";
+import TrainingBarActive from "../../../components/charts/BarChart";
 
 
 export default function TrainingDatasetVisuals() {
@@ -97,7 +97,7 @@ export default function TrainingDatasetVisuals() {
       </div>
 
       <div className="grid grid-cols-1">
-        
+
       </div>
     </Card>
   );

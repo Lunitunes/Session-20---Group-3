@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card"
 import { formatTimestamp } from "@/lib/utils";
-import { AnalysisSummary } from "@/types/trainingSummary"
+import { AnalysisSummary } from "@/types/analysisSummary"
 import { Eye, Trash2 } from 'lucide-react';
 import Link from "next/link";
 
@@ -30,6 +30,7 @@ export default function ListItem({data}: { data: AnalysisSummary }){
               </Link>
             </div>
             <div className="mr-3">
+
               <Trash2/>
             </div>
           </div>

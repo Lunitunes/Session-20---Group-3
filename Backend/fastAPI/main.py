@@ -216,28 +216,106 @@ async def get_csv(analysis_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"message": f"Error reading CSV: {str(e)}"}
         )
-
-TRAINING_DATA_PATH = BASE_PATH / "training_data.csv"
+    
+TRAINING_DATA_PATH = BASE_PATH / "analysis_data"
 # ID
-@app.get("/get_training_data{training_data_id}")
-async def get_training_data(training_data_id: str):
-    csv_file = TRAINING_DATA_PATH / f"{training_data_id}.csv"
-          
-    if not csv_file.exists():
+@app.get("/get_training_data")
+async def get_training_data():
+    training_json_path = TRAINING_DATA_PATH / "training.json"
+
+    if not training_json_path.exists():
         return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"message": "Training data file not found."}
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "training.json not found."}
         )
+
     try:
-        df = pd.read_csv(csv_file)
-        data = df.to_dict(orient="records")
-        
+        data = json.loads(training_json_path.read_text())
         return JSONResponse(content=data)
 
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"message": f"Error reading training data CSV: {str(e)}"}
+            content={"message": f"Error reading training.json: {str(e)}"}
+        )
+    
+@app.get("/get_training_radar/{training_id}")
+async def get_training_radar(training_id: str):
+    CSV_PATH = ANALYSIS_PATH / f"{training_id}.csv"
+
+    if not CSV_PATH.exists():
+        return JSONResponse(
+            status_code=404,
+            content={"message": f"Training dataset file {training_id}.csv not found."}
+        )
+
+    try:
+        df = pd.read_csv(CSV_PATH)
+        df.columns = df.columns.str.strip().str.lower()
+        df = df.drop(columns=["encodedcategory"], errors="ignore")
+
+        # Features to compare
+        features = [
+            "dur", "sbytes", "dbytes", "spkts", "dpkts",
+            "sttl", "dttl", "swin", "dwin"
+        ]
+        features = [f for f in features if f in df.columns]
+
+        # Group by raw prediction
+        grouped = df.groupby("prediction")[features].mean().round(4)
+
+        # Convert numeric category -> readable category using CATEGORY_MAP
+        trainingRadar = {
+            CATEGORY_MAP.get(int(pred), f"Class {pred}"): grouped.loc[pred].tolist()
+            for pred in grouped.index
+        }
+
+        return {
+            "metric": features,
+            "trainingRadar": trainingRadar
+        }
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"message": f"Error computing training radar: {str(e)}"}
+        )
+
+    
+@app.get("/get_prediction_radar/{analysis_id}")
+async def get_prediction_radar(analysis_id: str):
+    CSV_PATH = ANALYSIS_PATH / f"{analysis_id}.csv"
+
+    if not CSV_PATH.exists():
+        return JSONResponse(
+            status_code=404,
+            content={"message": f"Prediction CSV {analysis_id}.csv not found."}
+        )
+
+    try:
+        df = pd.read_csv(CSV_PATH)
+        df.columns = df.columns.str.strip().str.lower()
+
+        features = [
+            "dur", "sbytes", "dbytes", "spkts", "dpkts",
+            "sttl", "dttl", "swin", "dwin"
+        ]
+        features = [f for f in features if f in df.columns]
+
+        # Extract the single input row
+        row = df.iloc[0][features].to_dict()
+
+        radar_data_prediction = [
+            { "metric": feature, "Prediction": row[feature] }
+            for feature in features
+        ]
+
+        return {"radarDataPrediction": radar_data_prediction}
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"message": f"Error computing prediction radar: {str(e)}"}
         )
               
 @app.delete("/delete_analysis/{analysis_id}")
