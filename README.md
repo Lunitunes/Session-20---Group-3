@@ -34,4 +34,5 @@ On the frontend directory, type "npm install". After it is done, type "npm run d
 This will start the frontend. You can access this by opening a web-browser and going to the address "http://localhost:3000"
 
 On the Backend directory, type "uvicorn main:app --reload".
-This will start the frontend. You can access this by opening a web-browser and going to the address "http://localhost:8000/docs#"
+This will start the backend. You can access this by opening a web-browser and going to the address "http://localhost:8000/docs#"
+
