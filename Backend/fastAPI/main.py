@@ -151,7 +151,7 @@ async def upload_csv(name: str = Form(...) ,file: UploadFile = File()):
         record = {
           "analysis_id" : analysis_id,
           "analysis_name" : name,
-          "row_count" : len(df)
+          "row_count" : len(df),
           "timestamp" : datetime.now().isoformat(),
           "predicted_type" : CATEGORY_MAPPING
         }
