@@ -132,6 +132,12 @@ async def upload_csv(name: str = Form(...) ,file: UploadFile = File()):
         import io
         df = pd.read_csv(io.StringIO(contents.decode('utf-8')))
 
+        df = df.dropna(how="all")
+
+        if len(df) != 1:
+            raise ValueError("CSV file must contain exactly one row of data.")
+                  # This is not inclusive of the header data
+              
         df.columns = df.columns.str.strip().str.lower()
         df = df.drop(columns=["encodedcategory"], errors="ignore")
         df = df[model.feature_names_in_]
@@ -145,8 +151,9 @@ async def upload_csv(name: str = Form(...) ,file: UploadFile = File()):
         record = {
           "analysis_id" : analysis_id,
           "analysis_name" : name,
-          "row_count" : len(df),
+          "row_count" : len(df)
           "timestamp" : datetime.now().isoformat(),
+          "predicted_type" : CATEGORY_MAPPING
         }
         
         CSV_PATH = ANALYSIS_PATH / f"{analysis_id}.csv"
