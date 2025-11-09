@@ -4,7 +4,7 @@ import { AnalysisSummary } from "@/types/analysis";
 export default function ChartsPage(){
   
 
-  const chartData = 
+  // const chartData = 
   
 
 
