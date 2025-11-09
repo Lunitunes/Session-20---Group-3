@@ -10,10 +10,38 @@ import uuid
 from datetime import datetime
 import json
 
+"""
+Imports:
+- FastAPI framework:
+          HTTPException - Handling HTTP responses.
+          UploadFile - Handling CSV file uploads to the API.
+          File - Secondary handling CSV file uploads.
+          Status - Custom error-checking, validation and error handling status 
+          Form - Input fields and form validation.
+- CorsMiddleware
+          A component of the FastAPI Library used for configuring the origin that we want to permit to access the API.
+- JSONResponse
+          A component of the FastAPI Library that is used for returning a JSON-encoded HTTP response.
+- OS Import
+          A standard import for filepath manipulation.
+- Pandas
+          A non-standard import used for data analysis.
+- Pydantic
+          An import used for data validation.
+- Pathlib
+          An import for handling and manipulating filepaths.
+- UUID
+          An import for generating universally unique identifiers
+- datetime
+          An import for date/time representation
+- json
+          An import for reading and writing .JSON files
+"""
+
 app = FastAPI()
  
 app.add_middleware(
-    # frontend communication. Change details for connection.
+    # Allows for FastAPI to accept requests from any origin.
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
@@ -25,7 +53,7 @@ BASE_PATH = Path(__file__).resolve().parent
 
 model = None
 MODEL_FILENAME = "trained_model.pkl"
-# THIS FILE SHOULD BE IN THE SAME DIRECTORY AS BACKEND/FASTAPI/MAIN.PY
+# Pickle file containing our trained model - Random Forest Classifier
 
 ANALYSIS_PATH = BASE_PATH / "analysis_data"
 ANALYSIS_PATH.mkdir(exist_ok=True)
@@ -35,6 +63,7 @@ if not INDEX_PATH.exists():
     INDEX_PATH.write_text("[]")
  
 @app.on_event("startup")
+# Loads the Pickle/.PKL file
 async def load_model():
     global model
     try:
@@ -71,6 +100,7 @@ class InputData(BaseModel):
     ct_flw_http_mthd: float
 
 CATEGORY_MAP = {
+ # Category map for mapping data predictions.
     0: "Normal",
     1: "Fuzzers",
     2: "Analysis",
@@ -84,11 +114,13 @@ CATEGORY_MAP = {
 }
 
 @app.post("/upload_csv")
+# This function allows for the upload of a CSV file and generates a UUID. This UUID is stored inside of index.JSON.
 async def upload_csv(name: str = Form(...) ,file: UploadFile = File()):
     if not file.filename.endswith('.csv'):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"message": "Only CSV files are supported."}
+         # Error handling for CSV
         )
     if model is None:
         return JSONResponse(
@@ -109,7 +141,7 @@ async def upload_csv(name: str = Form(...) ,file: UploadFile = File()):
         CATEGORY_MAPPING = [CATEGORY_MAP.get(int(p), "Unknown") for p in predictions]
 
         analysis_id = uuid.uuid4().hex[:8]
-        # Saves Analysis Metadata
+        # Saves Analysis Metadata to JSON
         record = {
           "analysis_id" : analysis_id,
           "analysis_name" : name,
@@ -146,6 +178,7 @@ async def return_index_ids():
         )
 
 @app.get("/return_index")
+# This function obtains and displays the contents of index.JSON.
 async def return_index():
     try:
         index = json.loads(INDEX_PATH.read_text())
@@ -157,6 +190,7 @@ async def return_index():
         )
 
 @app.get("/get_csv/{analysis_id}")
+# This functions obtains a previously analyzed CSV by taking its generated UUID as a parameter.
 async def get_csv(analysis_id: str):
     CSV_PATH = ANALYSIS_PATH / f"{analysis_id}.csv"
     
