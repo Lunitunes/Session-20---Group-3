@@ -147,7 +147,6 @@ async def upload_csv(name: str = Form(...) ,file: UploadFile = File()):
           "analysis_name" : name,
           "row_count" : len(df),
           "timestamp" : datetime.now().isoformat(),
-          "category_count": df["prediction"].map(CATEGORY_MAP).value_counts().to_dict()
         }
         
         CSV_PATH = ANALYSIS_PATH / f"{analysis_id}.csv"
